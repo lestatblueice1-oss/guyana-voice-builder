@@ -43,7 +43,7 @@ const mockStruggles = [
   },
 ];
 
-const categories = ["All", "Infrastructure", "Public Health", "Housing", "Education", "Transportation"];
+const categories = ["All", "Infrastructure", "Public Health", "Housing", "Education", "Transportation", "Victimization"];
 
 export const Home = () => {
   const [activeCategory, setActiveCategory] = useState("All");

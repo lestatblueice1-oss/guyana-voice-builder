@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Home } from "./Home";
 import { Report } from "./Report";
 import { Districts } from "./Districts";
+import { Dashboard } from "./Dashboard";
 import { BottomNav } from "@/components/BottomNav";
 
 const Index = () => {
@@ -15,6 +16,8 @@ const Index = () => {
         return <Report />;
       case "districts":
         return <Districts />;
+      case "dashboard":
+        return <Dashboard />;
       case "profile":
         return (
           <div className="min-h-screen bg-background flex items-center justify-center pb-20">
