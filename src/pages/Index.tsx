@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Home } from "./Home";
 import { Report } from "./Report";
+import { Districts } from "./Districts";
 import { BottomNav } from "@/components/BottomNav";
 
 const Index = () => {
@@ -12,17 +13,8 @@ const Index = () => {
         return <Home />;
       case "report":
         return <Report />;
-      case "search":
-        return (
-          <div className="min-h-screen bg-background flex items-center justify-center pb-20">
-            <div className="text-center">
-              <h2 className="text-xl font-bold mb-2">Search Coming Soon</h2>
-              <p className="text-muted-foreground">
-                Advanced search features will be available in the next update.
-              </p>
-            </div>
-          </div>
-        );
+      case "districts":
+        return <Districts />;
       case "profile":
         return (
           <div className="min-h-screen bg-background flex items-center justify-center pb-20">
