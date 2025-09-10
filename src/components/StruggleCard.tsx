@@ -16,6 +16,7 @@ export const StruggleCard = ({
   headline,
   summary,
   category,
+  victimization,
   location,
   timeAgo,
   verified = false,
