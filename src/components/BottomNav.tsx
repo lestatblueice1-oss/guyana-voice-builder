@@ -1,4 +1,4 @@
-import { Home, Plus, MapPin, User, BarChart } from "lucide-react";
+import { Home, Plus, MapPin, BarChart, Diamond, Bot } from "lucide-react";
 
 interface BottomNavProps {
   activeTab: string;
@@ -11,7 +11,8 @@ export const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
     { id: "districts", icon: MapPin, label: "Districts" },
     { id: "dashboard", icon: BarChart, label: "Dashboard" },
     { id: "report", icon: Plus, label: "Report" },
-    { id: "profile", icon: User, label: "Profile" },
+    { id: "ai-help", icon: Bot, label: "AI Help" },
+    { id: "resources", icon: Diamond, label: "" },
   ];
 
   return (
@@ -23,12 +24,14 @@ export const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
             onClick={() => onTabChange(id)}
             className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
               activeTab === id
-                ? "text-primary bg-primary/5"
+                ? id === "resources" 
+                  ? "text-civic-blue bg-civic-blue/5" 
+                  : "text-primary bg-primary/5"
                 : "text-neutral-400 hover:text-primary hover:bg-primary/5"
             }`}
           >
-            <Icon className="w-5 h-5" />
-            <span className="text-xs font-medium">{label}</span>
+            <Icon className={`w-5 h-5 ${id === "resources" ? "text-civic-blue" : ""}`} />
+            {label && <span className="text-xs font-medium">{label}</span>}
           </button>
         ))}
       </div>

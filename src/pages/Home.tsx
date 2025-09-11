@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { StruggleCard } from "@/components/StruggleCard";
 import { Badge } from "@/components/ui/badge";
-import { Filter } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import { CategoryDrawer } from "@/components/CategoryDrawer";
 import { UserAvatar } from "@/components/UserAvatar";
+import { ProfileDrawer } from "@/components/ProfileDrawer";
 
 // Mock data for struggles
 const mockStruggles = [
@@ -47,9 +48,15 @@ const mockStruggles = [
 
 const categories = ["All", "Infrastructure", "Health", "Housing", "Education", "Transportation", "Victimization"];
 
-export const Home = () => {
+interface HomeProps {
+  onProfileMenuSelect: (menu: string) => void;
+}
+
+export const Home = ({ onProfileMenuSelect }: HomeProps) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const filteredStruggles = activeCategory === "All" 
     ? mockStruggles 
@@ -65,10 +72,33 @@ export const Home = () => {
             <div className="flex-1">
               <h1 className="font-heading font-bold text-2xl mb-1">The Citizen's Voice</h1>
             </div>
+            <UserAvatar onClick={() => setIsProfileDrawerOpen(true)} />
           </div>
-          <p className="text-primary-foreground/80 text-sm ml-11">
-            Amplifying community struggles across Guyana
-          </p>
+          <div className="flex items-center justify-between ml-11">
+            <p className="text-primary-foreground/80 text-sm">
+              Amplifying community struggles across Guyana
+            </p>
+            <button
+              onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+              className={`flex items-center gap-2 px-3 py-1 rounded-lg transition-all duration-200 ${
+                isSearchExpanded 
+                  ? "bg-primary-foreground/20 w-48" 
+                  : "bg-primary-foreground/10 hover:bg-primary-foreground/20"
+              }`}
+            >
+              <Search className="w-4 h-4" />
+              {isSearchExpanded ? (
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="flex-1 bg-transparent text-sm placeholder:text-primary-foreground/60 border-none outline-none"
+                  autoFocus
+                />
+              ) : (
+                <span className="text-sm">Search</span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -117,6 +147,13 @@ export const Home = () => {
           setActiveCategory(category);
           setIsDrawerOpen(false);
         }}
+      />
+
+      {/* Profile Drawer */}
+      <ProfileDrawer 
+        isOpen={isProfileDrawerOpen}
+        onClose={() => setIsProfileDrawerOpen(false)}
+        onMenuSelect={onProfileMenuSelect}
       />
     </div>
   );
