@@ -2,6 +2,8 @@ import { useState } from "react";
 import { StruggleCard } from "@/components/StruggleCard";
 import { Badge } from "@/components/ui/badge";
 import { Filter } from "lucide-react";
+import { CategoryDrawer } from "@/components/CategoryDrawer";
+import { GuyanaMapButton } from "@/components/GuyanaMapButton";
 
 // Mock data for struggles
 const mockStruggles = [
@@ -47,6 +49,7 @@ const categories = ["All", "Infrastructure", "Public Health", "Housing", "Educat
 
 export const Home = () => {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const filteredStruggles = activeCategory === "All" 
     ? mockStruggles 
@@ -57,8 +60,13 @@ export const Home = () => {
       {/* Header */}
       <div className="bg-gradient-civic text-primary-foreground px-4 py-6 safe-area-pt">
         <div className="max-w-md mx-auto">
-          <h1 className="font-heading font-bold text-2xl mb-1">The Citizen's Voice</h1>
-          <p className="text-primary-foreground/80 text-sm">
+          <div className="flex items-center gap-3 mb-2">
+            <GuyanaMapButton onClick={() => setIsDrawerOpen(true)} />
+            <div className="flex-1">
+              <h1 className="font-heading font-bold text-2xl mb-1">The Citizen's Voice</h1>
+            </div>
+          </div>
+          <p className="text-primary-foreground/80 text-sm ml-11">
             Amplifying community struggles across Guyana
           </p>
         </div>
@@ -100,6 +108,16 @@ export const Home = () => {
           )}
         </div>
       </div>
+
+      {/* Category Drawer */}
+      <CategoryDrawer 
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onCategorySelect={(category) => {
+          setActiveCategory(category);
+          setIsDrawerOpen(false);
+        }}
+      />
     </div>
   );
 };
