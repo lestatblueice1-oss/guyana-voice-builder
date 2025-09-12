@@ -4,8 +4,47 @@ import { Badge } from "@/components/ui/badge";
 import { CategoryDrawer } from "@/components/CategoryDrawer";
 import { UserAvatar } from "@/components/UserAvatar";
 import { ProfileDrawer } from "@/components/ProfileDrawer";
-import { Search, Sparkles, Loader } from "lucide-react";
-import { useStruggles } from "@/hooks/useApi";
+import { Search, Sparkles } from "lucide-react";
+
+// Mock data for struggles
+const mockStruggles = [
+  {
+    id: "1",
+    headline: "Georgetown Market Vendors Face Persistent Flooding Issues",
+    summary: "Local vendors report daily losses due to inadequate drainage system. Water accumulates during rain, damaging goods and deterring customers from accessing the market area.",
+    category: "Infrastructure",
+    location: "Georgetown, Region 4",
+    timeAgo: "2 hours ago",
+    verified: true,
+  },
+  {
+    id: "2", 
+    headline: "Rural Health Clinic Lacks Basic Medical Supplies",
+    summary: "Residents of Berbice report the local clinic has been without essential medications for weeks. Many are forced to travel long distances for basic healthcare needs.",
+    category: "Health",
+    location: "Berbice, Region 6",
+    timeAgo: "5 hours ago",
+    verified: true,
+  },
+  {
+    id: "3",
+    headline: "Housing Development Promises Unfulfilled After Two Years",
+    summary: "Families who paid deposits for affordable housing units report no progress on construction. Developer remains unreachable despite community attempts at contact.",
+    category: "Housing",
+    location: "Linden, Region 10",
+    timeAgo: "1 day ago",
+    verified: false,
+  },
+  {
+    id: "4",
+    headline: "School Children Walk Miles on Dangerous Road Daily",
+    summary: "Parents express concern over children's safety on poorly maintained road to school. No street lights and heavy traffic create hazardous conditions for students.",
+    category: "Education",
+    location: "Anna Regina, Region 2",
+    timeAgo: "2 days ago",
+    verified: true,
+  },
+];
 
 const categories = ["All", "Infrastructure", "Health", "Housing", "Education", "Transportation", "Victimization"];
 
@@ -20,28 +59,9 @@ export const Home = ({ onProfileMenuSelect }: HomeProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const { struggles, loading, error } = useStruggles();
-
   const filteredStruggles = activeCategory === "All" 
-    ? struggles 
-    : struggles.filter(struggle => struggle.category === activeCategory);
-
-  // Format timeAgo from created_at
-  const formatTimeAgo = (created_at: string) => {
-    const now = new Date();
-    const created = new Date(created_at);
-    const diffInMinutes = Math.floor((now.getTime() - created.getTime()) / 60000);
-    
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
-    } else if (diffInMinutes < 1440) {
-      const hours = Math.floor(diffInMinutes / 60);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else {
-      const days = Math.floor(diffInMinutes / 1440);
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    }
-  };
+    ? mockStruggles 
+    : mockStruggles.filter(struggle => struggle.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -86,21 +106,9 @@ export const Home = ({ onProfileMenuSelect }: HomeProps) => {
       {/* Struggles Feed */}
       <div className="px-4 py-4">
         <div className="max-w-md mx-auto space-y-4">
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <Loader className="w-6 h-6 animate-spin text-primary" />
-            </div>
-          ) : error ? (
-            <div className="text-center py-8">
-              <p className="text-destructive">Error: {error}</p>
-            </div>
-          ) : filteredStruggles.length > 0 ? (
-            filteredStruggles.map((struggle) => (
-              <StruggleCard 
-                key={struggle.id} 
-                {...struggle} 
-                timeAgo={formatTimeAgo(struggle.created_at)}
-              />
+          {mockStruggles.length > 0 ? (
+            mockStruggles.map((struggle) => (
+              <StruggleCard key={struggle.id} {...struggle} />
             ))
           ) : (
             <div className="text-center py-8">
