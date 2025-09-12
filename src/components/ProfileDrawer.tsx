@@ -17,8 +17,8 @@ const menuItems = [
 
 export const ProfileDrawer = ({ isOpen, onClose, onMenuSelect }: ProfileDrawerProps) => {
   return (
-    <Drawer open={isOpen} onOpenChange={onClose} direction="right">
-      <DrawerContent className="h-full w-3/4 ml-auto rounded-l-xl border-l border-card-border">
+    <Drawer open={isOpen} onOpenChange={onClose} direction="left">
+      <DrawerContent className="h-full w-3/4 mr-auto rounded-r-xl border-r border-card-border">
         <div className="p-6 h-full">
           {/* Profile Header */}
           <div className="text-center mb-8 pt-4">

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { CategoryDrawer } from "@/components/CategoryDrawer";
 import { UserAvatar } from "@/components/UserAvatar";
 import { ProfileDrawer } from "@/components/ProfileDrawer";
+import { Search, Sparkles } from "lucide-react";
 
 // Mock data for struggles
 const mockStruggles = [
@@ -55,6 +56,8 @@ export const Home = ({ onProfileMenuSelect }: HomeProps) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const filteredStruggles = activeCategory === "All" 
     ? mockStruggles 
@@ -65,16 +68,37 @@ export const Home = ({ onProfileMenuSelect }: HomeProps) => {
       {/* Header */}
       <div className="bg-gradient-civic text-primary-foreground px-4 py-6 safe-area-pt">
         <div className="max-w-md mx-auto">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-1">
             <UserAvatar onClick={() => setIsProfileDrawerOpen(true)} />
             <div className="flex-1">
-              <h1 className="font-heading font-bold text-2xl mb-1">The Citizen's Voice</h1>
+              <h1 className="font-heading font-bold text-2xl">The Citizen's Voice</h1>
+              <p className="text-primary-foreground/80 text-sm mt-1">
+                Amplifying community struggles across Guyana
+              </p>
             </div>
           </div>
-          <div className="ml-11">
-            <p className="text-primary-foreground/80 text-sm">
-              Amplifying community struggles across Guyana
-            </p>
+          
+          {/* Search and AI Help */}
+          <div className="ml-11 mt-3 flex items-center gap-3">
+            <div className={`flex items-center gap-2 bg-primary-foreground/10 rounded-lg px-3 py-2 transition-all duration-200 ${
+              isSearchFocused ? "bg-primary-foreground/20" : ""
+            }`}>
+              <Search className="w-4 h-4 text-primary-foreground/60" />
+              <input
+                type="text"
+                placeholder="Search entire app..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                className="bg-transparent text-sm text-primary-foreground placeholder:text-primary-foreground/60 border-none outline-none w-40"
+              />
+            </div>
+            
+            <button className="flex items-center gap-2 bg-primary-foreground/10 hover:bg-primary-foreground/20 rounded-lg px-3 py-2 transition-all duration-200">
+              <Sparkles className="w-4 h-4 text-primary-foreground/80" />
+              <span className="text-sm text-primary-foreground/80">AI Help</span>
+            </button>
           </div>
         </div>
       </div>

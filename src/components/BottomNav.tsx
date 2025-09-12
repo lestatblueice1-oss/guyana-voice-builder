@@ -1,4 +1,4 @@
-import { Home, Plus, MapPin, BarChart, Diamond, Bot } from "lucide-react";
+import { Home, Plus, MapPin, BarChart, Diamond } from "lucide-react";
 
 interface BottomNavProps {
   activeTab: string;
@@ -11,7 +11,6 @@ export const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
     { id: "districts", icon: MapPin, label: "Districts" },
     { id: "dashboard", icon: BarChart, label: "Dashboard" },
     { id: "report", icon: Plus, label: "Report" },
-    { id: "ai-help", icon: Bot, label: "AI Help" },
     { id: "resources", icon: Diamond, label: "" },
   ];
 
