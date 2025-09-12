@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { StruggleCard } from "@/components/StruggleCard";
 import { Badge } from "@/components/ui/badge";
-import { Filter, Search } from "lucide-react";
 import { CategoryDrawer } from "@/components/CategoryDrawer";
 import { UserAvatar } from "@/components/UserAvatar";
 import { ProfileDrawer } from "@/components/ProfileDrawer";
@@ -56,7 +55,6 @@ export const Home = ({ onProfileMenuSelect }: HomeProps) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const filteredStruggles = activeCategory === "All" 
     ? mockStruggles 
@@ -68,58 +66,15 @@ export const Home = ({ onProfileMenuSelect }: HomeProps) => {
       <div className="bg-gradient-civic text-primary-foreground px-4 py-6 safe-area-pt">
         <div className="max-w-md mx-auto">
           <div className="flex items-center gap-3 mb-2">
-            <UserAvatar onClick={() => setIsDrawerOpen(true)} />
+            <UserAvatar onClick={() => setIsProfileDrawerOpen(true)} />
             <div className="flex-1">
               <h1 className="font-heading font-bold text-2xl mb-1">The Citizen's Voice</h1>
             </div>
-            <UserAvatar onClick={() => setIsProfileDrawerOpen(true)} />
           </div>
-          <div className="flex items-center justify-between ml-11">
+          <div className="ml-11">
             <p className="text-primary-foreground/80 text-sm">
               Amplifying community struggles across Guyana
             </p>
-            <button
-              onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-              className={`flex items-center gap-2 px-3 py-1 rounded-lg transition-all duration-200 ${
-                isSearchExpanded 
-                  ? "bg-primary-foreground/20 w-48" 
-                  : "bg-primary-foreground/10 hover:bg-primary-foreground/20"
-              }`}
-            >
-              <Search className="w-4 h-4" />
-              {isSearchExpanded ? (
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="flex-1 bg-transparent text-sm placeholder:text-primary-foreground/60 border-none outline-none"
-                  autoFocus
-                />
-              ) : (
-                <span className="text-sm">Search</span>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Category Filter */}
-      <div className="px-4 py-4 border-b border-card-border bg-card">
-        <div className="max-w-md mx-auto">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="w-4 h-4 text-neutral-500" />
-            <span className="text-sm font-medium text-neutral-600">Filter by category</span>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {categories.map((category) => (
-              <Badge
-                key={category}
-                variant={activeCategory === category ? "civic" : "outline"}
-                className="whitespace-nowrap cursor-pointer"
-                onClick={() => setActiveCategory(category)}
-              >
-                {category}
-              </Badge>
-            ))}
           </div>
         </div>
       </div>
@@ -127,13 +82,13 @@ export const Home = ({ onProfileMenuSelect }: HomeProps) => {
       {/* Struggles Feed */}
       <div className="px-4 py-4">
         <div className="max-w-md mx-auto space-y-4">
-          {filteredStruggles.length > 0 ? (
-            filteredStruggles.map((struggle) => (
+          {mockStruggles.length > 0 ? (
+            mockStruggles.map((struggle) => (
               <StruggleCard key={struggle.id} {...struggle} />
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-neutral-400">No struggles found in this category.</p>
+              <p className="text-neutral-400">No struggles found.</p>
             </div>
           )}
         </div>
