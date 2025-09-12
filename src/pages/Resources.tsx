@@ -1,58 +1,10 @@
 import { useState } from "react";
-import { BarChart3, ArrowLeft } from "lucide-react";
+import { BarChart3, ArrowLeft, Loader } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { StruggleCard } from "@/components/StruggleCard";
 import { ResourcesTracker } from "@/components/ResourcesTracker";
 import { Button } from "@/components/ui/button";
-
-// Mock data for resource stories
-const resourceStories = [
-  {
-    id: "oil-1",
-    headline: "ExxonMobil Reports Record 380,000 BPD from Stabroek Block",
-    summary: "Latest production figures show Guyana's oil output reaching new heights with three FPSOs operational. Revenue sharing benefits local communities.",
-    category: "Oil & Gas",
-    location: "Stabroek Block, Offshore",
-    timeAgo: "3 hours ago",
-    verified: true,
-  },
-  {
-    id: "mining-1",
-    headline: "Aurora Gold Mine Expands Operations in Region 7",
-    summary: "New mining concessions approved for expanded gold extraction. Local employment opportunities increase by 200 positions.",
-    category: "Mining",
-    location: "Cuyuni-Mazaruni, Region 7",
-    timeAgo: "6 hours ago",
-    verified: true,
-  },
-  {
-    id: "agriculture-1",
-    headline: "Rice Production Reaches 700,000 Tonnes This Season",
-    summary: "Favorable weather conditions and improved irrigation systems boost rice yields across Region 2 and 3 farming areas.",
-    category: "Agriculture",
-    location: "Essequibo, Region 2",
-    timeAgo: "1 day ago",
-    verified: true,
-  },
-  {
-    id: "timber-1",
-    headline: "Sustainable Logging Initiative Launched in Region 8",
-    summary: "New forestry management program aims to balance timber extraction with environmental conservation efforts.",
-    category: "Timber",
-    location: "Potaro-Siparuni, Region 8",
-    timeAgo: "2 days ago",
-    verified: false,
-  },
-  {
-    id: "bauxite-1",
-    headline: "BOSAI Bauxite Company Increases Annual Production Target",
-    summary: "Chinese-owned mining operation announces 15% increase in bauxite extraction for export to aluminum refineries.",
-    category: "Bauxite",
-    location: "Linden, Region 10",
-    timeAgo: "3 days ago",
-    verified: true,
-  }
-];
+import { useResources, useLiveResourceData } from "@/hooks/useApi";
 
 const categories = ["All", "Oil & Gas", "Mining", "Timber", "Bauxite", "Agriculture"];
 
@@ -65,9 +17,29 @@ export const Resources = ({ selectedResource, onBack }: ResourcesProps) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
 
+  const { resources, loading: resourcesLoading, error: resourcesError } = useResources();
+  const { liveData, loading: liveLoading } = useLiveResourceData();
+
   const filteredStories = activeCategory === "All" 
-    ? resourceStories 
-    : resourceStories.filter(story => story.category === activeCategory);
+    ? resources 
+    : resources.filter(resource => resource.category === activeCategory);
+
+  // Format timeAgo from created_at
+  const formatTimeAgo = (created_at: string) => {
+    const now = new Date();
+    const created = new Date(created_at);
+    const diffInMinutes = Math.floor((now.getTime() - created.getTime()) / 60000);
+    
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minutes ago`;
+    } else if (diffInMinutes < 1440) {
+      const hours = Math.floor(diffInMinutes / 60);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else {
+      const days = Math.floor(diffInMinutes / 1440);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+  };
 
   if (selectedResource) {
     return (
@@ -87,15 +59,27 @@ export const Resources = ({ selectedResource, onBack }: ResourcesProps) => {
         </div>
 
         <div className="p-6">
-          {/* Mock dashboard content */}
+          {/* Live dashboard content */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-card p-4 rounded-lg border border-card-border">
               <h3 className="text-sm text-muted-foreground mb-1">Daily Production</h3>
-              <p className="text-2xl font-bold text-primary">380K BPD</p>
+              {liveLoading ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : (
+                <p className="text-2xl font-bold text-primary">
+                  {liveData?.oil_production?.daily_barrels?.toLocaleString() || '380K'} BPD
+                </p>
+              )}
             </div>
             <div className="bg-card p-4 rounded-lg border border-card-border">
               <h3 className="text-sm text-muted-foreground mb-1">Monthly Revenue</h3>
-              <p className="text-2xl font-bold text-secondary">$2.1B</p>
+              {liveLoading ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : (
+                <p className="text-2xl font-bold text-secondary">
+                  ${(liveData?.revenue?.monthly_usd / 1000000).toFixed(1) || '2.1'}B
+                </p>
+              )}
             </div>
           </div>
 
@@ -152,9 +136,24 @@ export const Resources = ({ selectedResource, onBack }: ResourcesProps) => {
       {/* Resources Feed */}
       <div className="px-4 py-4">
         <div className="max-w-md mx-auto space-y-4">
-          {filteredStories.length > 0 ? (
+          {resourcesLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : resourcesError ? (
+            <div className="text-center py-8">
+              <p className="text-destructive">Error: {resourcesError}</p>
+            </div>
+          ) : filteredStories.length > 0 ? (
             filteredStories.map((story) => (
-              <StruggleCard key={story.id} {...story} />
+              <StruggleCard 
+                key={story.id} 
+                {...story} 
+                headline={story.title}
+                summary={story.description}
+                timeAgo={formatTimeAgo(story.created_at)}
+                verified={true}
+              />
             ))
           ) : (
             <div className="text-center py-8">

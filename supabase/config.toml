@@ -1,1 +1,10 @@
 project_id = "mzffeeitqykcewprtbee"
+
+[functions.struggles]
+verify_jwt = false
+
+[functions.resources] 
+verify_jwt = false
+
+[functions.communities]
+verify_jwt = false
