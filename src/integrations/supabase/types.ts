@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       communities: {
         Row: {
           created_at: string
@@ -76,6 +100,57 @@ export type Database = {
           },
         ]
       }
+      ministry_data: {
+        Row: {
+          address: string
+          categories: string[]
+          contact: string
+          created_at: string
+          current_issues: string[]
+          email: string
+          id: string
+          implementations: string[]
+          minister_name: string | null
+          minister_photo_url: string | null
+          ministry_id: string
+          name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          address: string
+          categories?: string[]
+          contact: string
+          created_at?: string
+          current_issues?: string[]
+          email: string
+          id?: string
+          implementations?: string[]
+          minister_name?: string | null
+          minister_photo_url?: string | null
+          ministry_id: string
+          name: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          address?: string
+          categories?: string[]
+          contact?: string
+          created_at?: string
+          current_issues?: string[]
+          email?: string
+          id?: string
+          implementations?: string[]
+          minister_name?: string | null
+          minister_photo_url?: string | null
+          ministry_id?: string
+          name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -106,6 +181,48 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          evidence_urls: string[] | null
+          id: string
+          location: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_by: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          evidence_urls?: string[] | null
+          id?: string
+          location?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_by?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          evidence_urls?: string[] | null
+          id?: string
+          location?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_by?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

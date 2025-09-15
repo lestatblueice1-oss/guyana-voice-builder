@@ -10,6 +10,7 @@ import { MyReports } from "./MyReports";
 import { Communities } from "./Communities";
 import { Surveys } from "./Surveys";
 import { Settings } from "./Settings";
+import { Admin } from "./Admin";
 import { BottomNav } from "@/components/BottomNav";
 
 const Index = () => {
@@ -52,7 +53,9 @@ const Index = () => {
       case "surveys":
         return <Surveys />;
       case "settings":
-        return <Settings />;
+        return <Settings onNavigate={setActiveTab} />;
+      case "admin":
+        return <Admin />;
       case "ai-help":
         return (
           <div className="min-h-screen bg-background flex items-center justify-center pb-20">

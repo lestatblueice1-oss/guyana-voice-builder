@@ -1,7 +1,9 @@
-import { Settings as SettingsIcon, Bell, Shield, Palette, HelpCircle, LogOut } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Shield, Palette, HelpCircle, LogOut, Key } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { useAdmin } from "@/hooks/useAdmin";
+import { useAuth } from "@/hooks/useAuth";
 
 const settingsGroups = [
   {
@@ -33,7 +35,13 @@ const settingsGroups = [
   }
 ];
 
-export const Settings = () => {
+interface SettingsProps {
+  onNavigate?: (page: string) => void;
+}
+
+export const Settings = ({ onNavigate }: SettingsProps = {}) => {
+  const { isAdmin } = useAdmin();
+  const { signOut } = useAuth();
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="p-6">
@@ -86,9 +94,28 @@ export const Settings = () => {
               </CardContent>
             </Card>
 
+            {/* Admin Panel */}
+            {isAdmin && (
+              <Card>
+                <CardContent className="p-4">
+                  <Button 
+                    onClick={() => onNavigate?.("admin")}
+                    className="w-full justify-start"
+                  >
+                    <Key className="w-5 h-5 mr-3" />
+                    Admin Panel
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             <Card className="border-destructive/20">
               <CardContent className="p-4">
-                <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-destructive hover:text-destructive"
+                  onClick={() => signOut()}
+                >
                   <LogOut className="w-5 h-5 mr-3" />
                   Sign Out
                 </Button>

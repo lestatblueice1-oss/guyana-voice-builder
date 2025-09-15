@@ -3,22 +3,55 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Upload, Shield, Eye, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { supabase } from "@/integrations/supabase/client";
 
 const categories = ["Infrastructure", "Public Health", "Housing", "Education", "Transportation", "Other"];
 
 export const Report = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [evidenceFiles, setEvidenceFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { uploadImage, uploading } = useImageUpload({
+    bucket: "report-evidence",
+    path: user?.id
+  });
+
+  const handleFileUpload = (files: FileList | null) => {
+    if (files) {
+      const fileArray = Array.from(files);
+      setEvidenceFiles(prev => [...prev, ...fileArray].slice(0, 3)); // Max 3 files
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setEvidenceFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async () => {
-    if (!description.trim() || !selectedCategory) {
+    if (!title.trim() || !description.trim() || !selectedCategory) {
       toast({
         title: "Missing Information",
-        description: "Please provide a description and select a category.",
+        description: "Please provide a title, description, and select a category.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to submit a report.",
         variant: "destructive",
       });
       return;
@@ -26,18 +59,49 @@ export const Report = () => {
 
     setIsSubmitting(true);
     
-    // Simulate submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Upload evidence files
+      const evidenceUrls: string[] = [];
+      for (const file of evidenceFiles) {
+        const url = await uploadImage(file);
+        if (url) evidenceUrls.push(url);
+      }
+
+      // Submit report to database
+      const { error } = await supabase
+        .from("reports")
+        .insert({
+          title: title.trim(),
+          description: description.trim(),
+          category: selectedCategory,
+          location: location.trim() || "Not specified",
+          evidence_urls: evidenceUrls,
+          submitted_by: user.id
+        });
+
+      if (error) throw error;
+
       toast({
         title: "Report Submitted Successfully",
         description: "Your report will be reviewed within 24 hours.",
       });
       
       // Reset form
+      setTitle("");
       setDescription("");
       setSelectedCategory("");
-    }, 2000);
+      setLocation("");
+      setEvidenceFiles([]);
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your report. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -69,6 +133,23 @@ export const Report = () => {
             </div>
           </Card>
 
+          {/* Title */}
+          <div className="space-y-3">
+            <Label htmlFor="title" className="text-sm font-medium text-foreground">
+              Report Title <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Brief title describing the issue"
+              maxLength={100}
+            />
+            <p className="text-xs text-muted-foreground">
+              {title.length}/100 characters
+            </p>
+          </div>
+
           {/* Category Selection */}
           <div className="space-y-3">
             <label className="block text-sm font-medium text-foreground">
@@ -88,6 +169,19 @@ export const Report = () => {
             </div>
           </div>
 
+          {/* Location */}
+          <div className="space-y-3">
+            <Label htmlFor="location" className="text-sm font-medium text-foreground">
+              Location
+            </Label>
+            <Input
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Specific location or area affected"
+            />
+          </div>
+
           {/* Description */}
           <div className="space-y-3">
             <label className="block text-sm font-medium text-foreground">
@@ -105,19 +199,59 @@ export const Report = () => {
           </div>
 
           {/* Media Upload */}
-          <Card className="p-6 border-2 border-dashed border-card-border">
-            <div className="text-center space-y-3">
-              <Upload className="w-8 h-8 text-accent mx-auto" />
-              <div>
-                <Button variant="action" size="lg" className="w-full">
-                  Upload Video/Audio Evidence
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Optional: Add photos, videos, or audio recordings to support your report
-                </p>
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-foreground">
+              Evidence (Optional)
+            </Label>
+            <Card className="p-6 border-2 border-dashed border-card-border">
+              <div className="text-center space-y-3">
+                <Upload className="w-8 h-8 text-accent mx-auto" />
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*,video/*,audio/*"
+                    multiple
+                    onChange={(e) => handleFileUpload(e.target.files)}
+                    className="hidden"
+                    id="evidence-upload"
+                    disabled={uploading}
+                  />
+                  <Button 
+                    variant="action" 
+                    size="lg" 
+                    className="w-full"
+                    asChild
+                    disabled={uploading || evidenceFiles.length >= 3}
+                  >
+                    <label htmlFor="evidence-upload">
+                      {uploading ? "Uploading..." : "Upload Evidence"}
+                    </label>
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Upload photos, videos, or audio recordings (max 3 files)
+                  </p>
+                </div>
               </div>
-            </div>
-          </Card>
+              
+              {evidenceFiles.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm font-medium">Selected Files:</p>
+                  {evidenceFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between bg-muted p-2 rounded">
+                      <span className="text-sm truncate">{file.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFile(index)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
 
           {/* Review Process Notice */}
           <Card className="p-4 bg-muted/50 border-card-border">
@@ -137,12 +271,12 @@ export const Report = () => {
           <div className="pt-4">
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || !description.trim() || !selectedCategory}
+              disabled={isSubmitting || !title.trim() || !description.trim() || !selectedCategory || uploading}
               className="w-full"
               variant="civic"
               size="lg"
             >
-              {isSubmitting ? "Submitting Report..." : "Submit Report"}
+              {isSubmitting ? "Submitting Report..." : uploading ? "Uploading Files..." : "Submit Report"}
             </Button>
           </div>
 
