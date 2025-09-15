@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Home } from "./Home";
 import { Report } from "./Report";
 import { Districts } from "./Districts";
+import { Ministries } from "./Ministries";
 import { Dashboard } from "./Dashboard";
 import { Resources } from "./Resources";
 import { Profile } from "./Profile";
@@ -31,6 +32,8 @@ const Index = () => {
         return <Report />;
       case "districts":
         return <Districts />;
+      case "ministries":
+        return <Ministries />;
       case "dashboard":
         return <Dashboard />;
       case "resources":
